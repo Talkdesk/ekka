@@ -1,5 +1,5 @@
 %%%===================================================================
-%%% Copyright (c) 2013-2018 EMQ Enterprise, Inc. All Rights Reserved.
+%%% Copyright (c) 2013-2018 EMQ Inc. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@
 
 -define(LOG(Level, Format, Args), lager:Level("Ekka(k8s): " ++ Format, Args)).
 
-%%%===================================================================
-%%% ekka_cluster_strategy Callbacks
-%%%===================================================================
+%%--------------------------------------------------------------------
+%% ekka_cluster_strategy callbacks
+%%--------------------------------------------------------------------
 
 discover(Options) ->
     Server = get_value(apiserver, Options),
@@ -60,9 +60,9 @@ register(_Options) ->
 unregister(_Options) ->
     ignore.
 
-%%%===================================================================
-%%% Internal functions
-%%%===================================================================
+%%--------------------------------------------------------------------
+%% Internal functions
+%%--------------------------------------------------------------------
 
 k8s_service_get(Server, Service, Namespace) ->
     Headers = [{"Authorization", "Bearer " ++ token()}],

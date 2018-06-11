@@ -14,30 +14,25 @@
 %%% limitations under the License.
 %%%===================================================================
 
--module(ekka_cluster_strategy).
+-module(ekka_locker_SUITE).
 
--ifdef(use_specs).
+-include_lib("eunit/include/eunit.hrl").
 
--type(options() :: list(proplists:property())).
+-compile(export_all).
+-compile(nowarn_export_all).
 
--callback(discover(options()) -> {ok, list(node())} | {error, term()}).
+all() ->
+    [{group, locker}].
 
--callback(lock(options()) -> ok | ignore | {error, term()}).
+groups() ->
+    [{locker, [], [aquire_local]}].
 
--callback(unlock(options()) -> ok | ignore | {error, term()}).
-
--callback(register(options()) -> ok | ignore | {error, term()}).
-
--callback(unregister(options()) -> ok | ignore | {error, term()}).
-
--else.
-
--export([behaviour_info/1]).
-
-behaviour_info(callbacks) ->
-    [{discover, 1}, {lock, 1}, {unlock, 1}, {register, 1}, {unregister, 1}];
-behaviour_info(_Other) ->
-    undefined.
-
--endif.
+aquire_local(_Conf) ->
+    Node = node(),
+    {ok, Locker} = ekka_locker:start_link(test_locker),
+    ?assertEqual({true, [Node]}, ekka_locker:aquire(test_locker, resource1)),
+    ?assertEqual({true, [Node]}, ekka_locker:aquire(test_locker, resource1)),
+    ?assertEqual({true, [Node]}, ekka_locker:release(test_locker, resource1)),
+    ?assertEqual({false, [Node]}, ekka_locker:release(test_locker, resource1)),
+    ekka_locker:stop(Locker).
 

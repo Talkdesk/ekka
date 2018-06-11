@@ -14,30 +14,23 @@
 %%% limitations under the License.
 %%%===================================================================
 
--module(ekka_cluster_strategy).
+-module(ekka_locker_sup).
 
--ifdef(use_specs).
+-behaviour(supervisor).
 
--type(options() :: list(proplists:property())).
+-export([start_link/0]).
 
--callback(discover(options()) -> {ok, list(node())} | {error, term()}).
+-export([init/1]).
 
--callback(lock(options()) -> ok | ignore | {error, term()}).
+start_link() ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
--callback(unlock(options()) -> ok | ignore | {error, term()}).
-
--callback(register(options()) -> ok | ignore | {error, term()}).
-
--callback(unregister(options()) -> ok | ignore | {error, term()}).
-
--else.
-
--export([behaviour_info/1]).
-
-behaviour_info(callbacks) ->
-    [{discover, 1}, {lock, 1}, {unlock, 1}, {register, 1}, {unregister, 1}];
-behaviour_info(_Other) ->
-    undefined.
-
--endif.
+init([]) ->
+    Locker = #{id       => ekka_locker,
+               start    => {ekka_locker, start_link, []},
+               restart  => permanent,
+               shutdown => 5000,
+               type     => worker,
+               modules  => [ekka_locker]},
+    {ok, {{one_for_one, 100, 3600}, [Locker]}}.
 

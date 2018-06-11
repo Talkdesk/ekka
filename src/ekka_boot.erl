@@ -1,5 +1,5 @@
 %%%===================================================================
-%%% Copyright (c) 2013-2018 EMQ Enterprise, Inc. All Rights Reserved.
+%%% Copyright (c) 2013-2018 EMQ Inc. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 %% only {F, Args}...
 apply_module_attributes(Name) ->
-    [{Module, [apply(Module, F, Args) || {F, Args} <- Attrs]} || 
+    [{Module, [apply(Module, F, Args) || {F, Args} <- Attrs]} ||
         {_App, Module, Attrs} <- all_module_attributes(Name)].
 
 %% Copy from rabbit_misc.erl
@@ -40,7 +40,6 @@ all_module_attributes(Name) ->
               end
       end, [], Targets).
 
-%% Copy from rabbit_misc.erl
 module_attributes(Module) ->
     case catch Module:module_info(attributes) of
         {'EXIT', {undef, [{Module, module_info, [attributes], []} | _]}} ->

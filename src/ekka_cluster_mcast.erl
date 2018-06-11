@@ -1,5 +1,5 @@
 %%%===================================================================
-%%% Copyright (c) 2013-2018 EMQ Enterprise, Inc. All Rights Reserved.
+%%% Copyright (c) 2013-2018 EMQ Inc. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@
 
 -import(proplists, [get_value/2, get_value/3]).
 
-%% Cluster strategy Callbacks
+%% Cluster strategy callbacks
 -export([discover/1, lock/1, unlock/1, register/1, unregister/1]).
 
 -export([start_link/1]).
 
-%% gen_server Callbacks
+%% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
@@ -43,13 +43,12 @@
 -record(state, {sock, addr, ports, cookie, seen = []}).
 
 -define(SERVER, ?MODULE).
-
 -define(LOG(Level, Format, Args),
         lager:Level("Ekka(Mcast): " ++ Format, Args)).
 
-%%%===================================================================
-%%% ekka_cluster_strategy Callbacks
-%%%===================================================================
+%%--------------------------------------------------------------------
+%% ekka_cluster_strategy callbacks
+%%--------------------------------------------------------------------
 
 discover(Options) ->
     Server = case whereis(?SERVER) of
@@ -60,13 +59,13 @@ discover(Options) ->
 
 lock(_Options) ->
     ignore.
-    
+
 unlock(_Options) ->
     ignore.
 
 register(_Options) ->
     ignore.
-    
+
 unregister(_Options) ->
     ignore.
 
@@ -80,9 +79,9 @@ ensure_started(Options) ->
 start_link(Options) ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, Options, []).
 
-%%%===================================================================
-%%% gen_server Callbacks
-%%%===================================================================
+%%--------------------------------------------------------------------
+%% gen_server callbacks
+%%--------------------------------------------------------------------
 
 init(Options) ->
     Addr  = get_value(addr, Options),
@@ -157,16 +156,16 @@ terminate(_Reason, #state{sock = Sock}) ->
 code_change(_OldVsn, State, _Extra) ->
 	{ok, State}.
 
-%%%===================================================================
-%%% Internal functions
-%%%===================================================================
+%%--------------------------------------------------------------------
+%% Internal functions
+%%--------------------------------------------------------------------
 
 handshake(Cookie) ->
-    {handshake, node(), ekka:env(cluster_name, ekka), Cookie}.
+    {handshake, node(), ekka:env(cluster_name, undefined), Cookie}.
 
 udp_open([], _Options) ->
     {error, eaddrinuse};
-    
+
 udp_open([Port|Ports], Options) ->
     case gen_udp:open(Port, [binary, {active, 10}, {reuseaddr, true} | Options]) of
         {ok, Sock} ->

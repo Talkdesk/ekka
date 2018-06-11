@@ -1,5 +1,5 @@
 %%%===================================================================
-%%% Copyright (c) 2013-2018 EMQ Enterprise, Inc. All Rights Reserved.
+%%% Copyright (c) 2013-2018 EMQ Inc. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 %% @doc Generate global unique id.
 %%
 %% --------------------------------------------------------
-%% |        Timestamp       |  NodeID + PID  |  Sequence  | 
+%% |        Timestamp       |  NodeID + PID  |  Sequence  |
 %% |<------- 64bits ------->|<--- 48bits --->|<- 16bits ->|
 %% --------------------------------------------------------
-%% 
+%%
 %% 1. Timestamp: erlang:system_time if Erlang >= R18, otherwise os:timestamp
 %% 2. NodeId:    encode node() to 2 bytes integer
 %% 3. Pid:       encode pid to 4 bytes integer
