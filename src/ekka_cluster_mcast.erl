@@ -117,7 +117,15 @@ handle_cast(Msg, State) ->
 
 handle_info({reply, discover, From}, State = #state{seen = Seen}) ->
     gen_server:reply(From, {ok, [node() | Seen]}),
+    erlang:send_after(3000, self(), udp_send),
     {noreply, State#state{seen = []}};
+
+handle_info(udp_send, State = #state{sock = Sock, addr = Addr,ports = Ports, cookie = Cookie}) ->
+    lists:foreach(fun(Port) ->
+                    udp_send(Sock, Addr, Port, handshake(Cookie))
+                  end, Ports),
+    erlang:send_after(3000, self(), udp_send),
+    {noreply, State};
 
 handle_info({udp, Sock, Ip, InPort, Data}, State = #state{sock = Sock, cookie = Cookie,seen = Seen}) ->
     inet:setopts(Sock, [{active, 1}]),
@@ -154,7 +162,7 @@ terminate(_Reason, #state{sock = Sock}) ->
     gen_udp:close(Sock).
 
 code_change(_OldVsn, State, _Extra) ->
-	{ok, State}.
+    {ok, State}.
 
 %%--------------------------------------------------------------------
 %% Internal functions
