@@ -31,7 +31,9 @@ join(Node) when Node =:= node() ->
 join(Node) when is_atom(Node) ->
     case {ekka_mnesia:is_node_in_cluster(Node), ekka_node:is_running(Node, ekka)} of
         {false, true} ->
-            prepare(join), ok = ekka_mnesia:join_cluster(Node), reboot();
+            prepare(join),
+            timer:sleep(3000),
+            ok = ekka_mnesia:join_cluster(Node), reboot();
         {false, false} ->
             {error, {node_down, Node}};
         {true, _} ->
