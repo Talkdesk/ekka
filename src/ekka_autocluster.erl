@@ -42,8 +42,7 @@ run(App, Fun) ->
                       group_leader(whereis(init), self()),
                       wait_application_ready(App, 10),
                       try
-                          discover_and_join(),
-                          run_callback(Fun)
+                          discover_and_join()
                       catch
                           _:Error ->
                               ?LOG(error, "Discover error: ~p~n~p", [Error, erlang:get_stacktrace()])
@@ -52,7 +51,9 @@ run(App, Fun) ->
                       end,
                       %% Check if the node joined cluster?
                       case ekka_mnesia:is_node_in_cluster() of
-                          true  -> ok;
+                          true  -> run_callback(Fun),
+				   ok;
+
                           false -> ?LOG(info, "Run autocluster again...", []),
                                    timer:sleep(?RETRY_INTERVAL),
                                    run(App, Fun)
